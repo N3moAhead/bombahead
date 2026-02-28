@@ -19,7 +19,6 @@ templ Base(csrfToken string, user *models.User, children ...templ.Component) {
         <body>
         		@navbar.Navbar(csrfToken, user)
            	{ children... }
-            <script src="https://unpkg.com/htmx.org@1.9.10"></script>
             <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         </body>
     </html>
