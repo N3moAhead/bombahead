@@ -6,6 +6,7 @@ tool github.com/a-h/templ/cmd/templ
 
 require (
 	github.com/a-h/templ v0.3.977
+	github.com/alecthomas/chroma/v2 v2.23.1
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/csrf v1.7.2
@@ -14,6 +15,8 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/markbates/goth v1.82.0
 	github.com/rabbitmq/amqp091-go v1.10.0
+	github.com/yuin/goldmark v1.4.15
+	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc
 	golang.org/x/oauth2 v0.35.0
 	gorm.io/datatypes v1.2.7
 	gorm.io/driver/postgres v1.6.0
@@ -27,6 +30,7 @@ require (
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cli/browser v1.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/fatih/color v1.16.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect

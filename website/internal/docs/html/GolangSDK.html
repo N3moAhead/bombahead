@@ -1,0 +1,216 @@
+<article class="prose max-w-none docs-markdown">
+<h1 id="bombahead-go">bombahead-go</h1>
+<p>Go SDK for building Bomberman bots that connect to a Bombahead game server over WebSocket.</p>
+<h2 id="installation">Installation</h2>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>go get github.com/N3moAhead/bombahead-go
+</span></span></code></pre><h2 id="quick-start">Quick Start</h2>
+<ol>
+<li>Implement the <code>bombahead.Bot</code> interface.</li>
+<li>Call <code>bombahead.Run(yourBot)</code> from <code>main</code>.</li>
+<li>Run your program.</li>
+</ol>
+<h2 id="core-api">Core API</h2>
+<h3 id="run">Run</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> <span style="color:#50fa7b">Run</span>(userBot Bot)
+</span></span></code></pre><p>Starts the bot client loop:</p>
+<ul>
+<li>Connects to server.</li>
+<li>Marks player ready.</li>
+<li>Receives game state messages.</li>
+<li>Builds <code>GameHelpers</code>.</li>
+<li>Calls <code>userBot.GetNextMove(state, helpers)</code>.</li>
+<li>Sends returned action to server.</li>
+<li>Re-readies automatically after <code>back_to_lobby</code>.</li>
+</ul>
+<p>This function blocks until connection closes or a fatal runtime error occurs.</p>
+<h3 id="bot">Bot</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> Bot <span style="color:#8be9fd;font-style:italic">interface</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    <span style="color:#50fa7b">GetNextMove</span>(state <span style="color:#ff79c6">*</span>GameState, helpers <span style="color:#ff79c6">*</span>GameHelpers) Action
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>}
+</span></span></code></pre><p>Implement this interface to provide your bot logic.</p>
+<h3 id="newgamehelpers">NewGameHelpers</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> <span style="color:#50fa7b">NewGameHelpers</span>(state <span style="color:#ff79c6">*</span>GameState) <span style="color:#ff79c6">*</span>GameHelpers
+</span></span></code></pre><p>Creates helper utilities bound to the current game state.</p>
+<h2 id="types-and-models">Types and Models</h2>
+<h3 id="action">Action</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> Action <span style="color:#8be9fd">string</span>
+</span></span></code></pre><p>Possible actions:</p>
+<ul>
+<li><code>MoveUp</code></li>
+<li><code>MoveDown</code></li>
+<li><code>MoveLeft</code></li>
+<li><code>MoveRight</code></li>
+<li><code>PlaceBomb</code></li>
+<li><code>DoNothing</code></li>
+</ul>
+<h3 id="celltype">CellType</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> CellType <span style="color:#8be9fd">string</span>
+</span></span></code></pre><p>Possible values:</p>
+<ul>
+<li><code>Air</code></li>
+<li><code>Wall</code></li>
+<li><code>Box</code></li>
+</ul>
+<h3 id="position">Position</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> Position <span style="color:#8be9fd;font-style:italic">struct</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    X <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    Y <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>}
+</span></span></code></pre><p>Methods:</p>
+<ul>
+<li><code>DistanceTo(other Position) int</code>: Manhattan distance between two positions.</li>
+</ul>
+<h3 id="player">Player</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> Player <span style="color:#8be9fd;font-style:italic">struct</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    ID     <span style="color:#8be9fd">string</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    Pos    Position
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>    Health <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>    Score  <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>}
+</span></span></code></pre><h3 id="bomb">Bomb</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> Bomb <span style="color:#8be9fd;font-style:italic">struct</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    Pos  Position
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    Fuse <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>}
+</span></span></code></pre><h3 id="field">Field</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> Field <span style="color:#8be9fd;font-style:italic">struct</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    Width  <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    Height <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>    Cells  []CellType
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>}
+</span></span></code></pre><p>Methods:</p>
+<ul>
+<li><code>CellAt(pos Position) CellType</code>: Returns cell at <code>pos</code>, or <code>Wall</code> when out of bounds.</li>
+</ul>
+<h3 id="gamestate">GameState</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> GameState <span style="color:#8be9fd;font-style:italic">struct</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    CurrentTick <span style="color:#8be9fd">int</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>    Me          <span style="color:#ff79c6">*</span>Player
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>    Opponents   []Player
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>    Players     []Player
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>    Field       Field
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span>    Bombs       []Bomb
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span>    Explosions  []Position
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9</span><span>}
+</span></span></code></pre><p>Represents all data your bot receives for one tick.</p>
+<h2 id="gamehelpers-api">GameHelpers API</h2>
+<p><code>GameHelpers</code> provides utility functions for pathing and safety checks.</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">type</span> GameHelpers <span style="color:#8be9fd;font-style:italic">struct</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    State <span style="color:#ff79c6">*</span>GameState
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>}
+</span></span></code></pre><h3 id="iswalkable">IsWalkable</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> (h <span style="color:#ff79c6">*</span>GameHelpers) <span style="color:#50fa7b">IsWalkable</span>(pos Position) <span style="color:#8be9fd">bool</span>
+</span></span></code></pre><p>Returns <code>true</code> if position:</p>
+<ul>
+<li>Is inside board bounds.</li>
+<li>Is not a <code>Wall</code>.</li>
+<li>Is not a <code>Box</code>.</li>
+<li>Is not currently occupied by a bomb.</li>
+</ul>
+<h3 id="getadjacentwalkablepositions">GetAdjacentWalkablePositions</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> (h <span style="color:#ff79c6">*</span>GameHelpers) <span style="color:#50fa7b">GetAdjacentWalkablePositions</span>(pos Position) []Position
+</span></span></code></pre><p>Returns walkable adjacent cells in this fixed order:</p>
+<ul>
+<li>Up</li>
+<li>Right</li>
+<li>Down</li>
+<li>Left</li>
+</ul>
+<h3 id="getnextactiontowards">GetNextActionTowards</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> (h <span style="color:#ff79c6">*</span>GameHelpers) <span style="color:#50fa7b">GetNextActionTowards</span>(start, target Position) Action
+</span></span></code></pre><p>Uses BFS pathfinding and returns the next movement action from <code>start</code> toward <code>target</code>.</p>
+<ul>
+<li>Returns <code>DoNothing</code> if <code>start == target</code>.</li>
+<li>Returns <code>DoNothing</code> if no valid path exists.</li>
+</ul>
+<h3 id="issafe">IsSafe</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> (h <span style="color:#ff79c6">*</span>GameHelpers) <span style="color:#50fa7b">IsSafe</span>(pos Position) <span style="color:#8be9fd">bool</span>
+</span></span></code></pre><p>Returns <code>false</code> when:</p>
+<ul>
+<li>Position is out of bounds.</li>
+<li>Position currently has a bomb.</li>
+<li>Position is in active explosion cells.</li>
+<li>Position is in predicted blast range of bombs that will trigger now (<code>Fuse &lt;= 1</code>) or by chain reaction.</li>
+</ul>
+<h3 id="getnearestsafeposition">GetNearestSafePosition</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> (h <span style="color:#ff79c6">*</span>GameHelpers) <span style="color:#50fa7b">GetNearestSafePosition</span>(start Position) Position
+</span></span></code></pre><p>Finds closest safe and walkable cell with BFS.</p>
+<ul>
+<li>Returns <code>start</code> if it is already safe.</li>
+<li>Returns <code>start</code> if no safe reachable cell exists.</li>
+</ul>
+<h3 id="findnearestbox">FindNearestBox</h3>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">func</span> (h <span style="color:#ff79c6">*</span>GameHelpers) <span style="color:#50fa7b">FindNearestBox</span>(start Position) (Position, <span style="color:#8be9fd">bool</span>)
+</span></span></code></pre><p>Finds nearest reachable <code>Box</code> tile.</p>
+<ul>
+<li>BFS can traverse <code>Air</code> and <code>Box</code>.</li>
+<li>BFS does not traverse through <code>Wall</code>.</li>
+<li>Returns <code>found=false</code> when no box is reachable.</li>
+</ul>
+<h2 id="complete-minimal-bot-example">Complete Minimal Bot Example</h2>
+<p>This example:</p>
+<ul>
+<li>Escapes danger first.</li>
+<li>Moves toward nearest box.</li>
+<li>Places a bomb when standing next to a box.</li>
+<li>Otherwise idles.</li>
+</ul>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#ff79c6">package</span> main
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#ff79c6">import</span> (
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>	<span style="color:#f1fa8c">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>	<span style="color:#f1fa8c">&#34;github.com/N3moAhead/bombahead-go&#34;</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span><span style="color:#8be9fd;font-style:italic">type</span> SimpleBot <span style="color:#8be9fd;font-style:italic">struct</span>{}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span><span style="color:#8be9fd;font-style:italic">func</span> (b <span style="color:#ff79c6">*</span>SimpleBot) <span style="color:#50fa7b">GetNextMove</span>(state <span style="color:#ff79c6">*</span>bombahead.GameState, h <span style="color:#ff79c6">*</span>bombahead.GameHelpers) bombahead.Action {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>	<span style="color:#ff79c6">if</span> state <span style="color:#ff79c6">==</span> <span style="color:#ff79c6">nil</span> <span style="color:#ff79c6">||</span> state.Me <span style="color:#ff79c6">==</span> <span style="color:#ff79c6">nil</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>		<span style="color:#ff79c6">return</span> bombahead.DoNothing
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>	}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>	me <span style="color:#ff79c6">:=</span> state.Me.Pos
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>	<span style="color:#ff79c6">if</span> !h.<span style="color:#50fa7b">IsSafe</span>(me) {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>		safe <span style="color:#ff79c6">:=</span> h.<span style="color:#50fa7b">GetNearestSafePosition</span>(me)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>		<span style="color:#ff79c6">return</span> h.<span style="color:#50fa7b">GetNextActionTowards</span>(me, safe)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span>	}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>	boxPos, found <span style="color:#ff79c6">:=</span> h.<span style="color:#50fa7b">FindNearestBox</span>(me)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>	<span style="color:#ff79c6">if</span> found {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span>		dist <span style="color:#ff79c6">:=</span> me.<span style="color:#50fa7b">DistanceTo</span>(boxPos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span>		<span style="color:#ff79c6">if</span> dist <span style="color:#ff79c6">==</span> <span style="color:#bd93f9">1</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span>			<span style="color:#ff79c6">return</span> bombahead.PlaceBomb
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span>		}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span>		<span style="color:#ff79c6">if</span> dist &gt; <span style="color:#bd93f9">1</span> {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30</span><span>			<span style="color:#ff79c6">return</span> h.<span style="color:#50fa7b">GetNextActionTowards</span>(me, boxPos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31</span><span>		}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32</span><span>	}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34</span><span>	<span style="color:#ff79c6">return</span> bombahead.DoNothing
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35</span><span>}
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37</span><span><span style="color:#8be9fd;font-style:italic">func</span> <span style="color:#50fa7b">main</span>() {
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38</span><span>	log.<span style="color:#50fa7b">Println</span>(<span style="color:#f1fa8c">&#34;Starting SimpleBot...&#34;</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">39</span><span>	bombahead.<span style="color:#50fa7b">Run</span>(<span style="color:#ff79c6">&amp;</span>SimpleBot{})
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">40</span><span>}
+</span></span></code></pre><h2 id="suggested-project-layout">Suggested Project Layout</h2>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>my-bot/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>  go.mod
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>  cmd/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span>    mybot/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>      main.go
+</span></span></code></pre><h2 id="error-handling-notes">Error Handling Notes</h2>
+<ul>
+<li><code>Run</code> logs and exits on connection failures or send failures.</li>
+<li>Some malformed server payloads are logged and skipped, allowing loop continuation.</li>
+<li>Unknown message types are ignored by design.</li>
+</ul>
+<h2 id="compatibility">Compatibility</h2>
+<ul>
+<li>Module: <code>github.com/N3moAhead/bombahead-go</code></li>
+<li>Go version from this SDK: <code>go 1.23</code></li>
+</ul>
+
+</article>

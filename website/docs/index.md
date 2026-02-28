@@ -1,0 +1,3 @@
+# BombAhead Documentation
+
+Hey welcome

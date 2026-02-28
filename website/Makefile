@@ -1,7 +1,7 @@
 CSS_INPUT = ./static/css/app.css
 CSS_OUTPUT = ./static/css/dist.css
 
-.PHONY: fmt vet templ tailwind build run dev
+.PHONY: fmt vet templ tailwind build run dev docs
 
 fmt:
 	go fmt ./...
@@ -15,7 +15,11 @@ templ:
 tailwind:
 	npx @tailwindcss/cli -i $(CSS_INPUT) -o $(CSS_OUTPUT) --minify
 
-build: templ tailwind vet
+docs:
+	@echo "--- Generating Docs ---"
+	go run cmd/generate_docs/main.go
+
+build: templ tailwind docs vet
 	go build -o bombahead ./cmd/website/main.go
 
 run: build

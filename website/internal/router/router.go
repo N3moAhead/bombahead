@@ -64,6 +64,7 @@ func Start(cfg *cfg.Config) {
 	router.Mount("/matches", MatchRoutes())
 
 	router.Route("/bots", botRoutes)
+	router.Route("/docs", docRoutes)
 
 	log.Info("Starting website on port %s", cfg.Port)
 	err := http.ListenAndServe(cfg.Port, router)
