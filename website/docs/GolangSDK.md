@@ -1,240 +1,40 @@
-# bombahead-go
+# Go Bot Tutorial
 
-Go SDK for building Bomberman bots that connect to a Bombahead game server over WebSocket.
+This guide shows how to build a minimal BombAhead bot with Go, test it locally, package it as a container image, and push it to `ghcr.io` so you can register it on the platform later.
 
-## Installation
+<p><strong>Note:</strong> This page is a practical tutorial. The old content was only added for testing and has been replaced.</p>
 
-```
+## 1. Prerequisites
+
+- Go 1.23+
+- Docker
+- A GitHub account (for `ghcr.io`)
+
+<p>Podman works as well. You can replace <code>docker</code> with <code>podman</code> in the commands below.</p>
+
+## 2. Create a new bot project
+
+```bash
+mkdir my-bombahead-go-bot
+cd my-bombahead-go-bot
+go mod init github.com/<your-user>/my-bombahead-go-bot
 go get github.com/N3moAhead/bombahead-go
 ```
 
-## Quick Start
+Recommended structure:
 
-1. Implement the `bombahead.Bot` interface.
-2. Call `bombahead.Run(yourBot)` from `main`.
-4. Run your program.
-
-## Core API
-
-### Run
-
-```go
-func Run(userBot Bot)
+```txt
+my-bombahead-go-bot/
+  go.mod
+  go.sum
+  cmd/
+    bot/
+      main.go
 ```
 
-Starts the bot client loop:
+## 3. Write a minimal bot
 
-- Connects to server.
-- Marks player ready.
-- Receives game state messages.
-- Builds `GameHelpers`.
-- Calls `userBot.GetNextMove(state, helpers)`.
-- Sends returned action to server.
-- Re-readies automatically after `back_to_lobby`.
-
-This function blocks until connection closes or a fatal runtime error occurs.
-
-### Bot
-
-```go
-type Bot interface {
-    GetNextMove(state *GameState, helpers *GameHelpers) Action
-}
-```
-
-Implement this interface to provide your bot logic.
-
-### NewGameHelpers
-
-```go
-func NewGameHelpers(state *GameState) *GameHelpers
-```
-
-Creates helper utilities bound to the current game state.
-
-## Types and Models
-
-### Action
-
-```go
-type Action string
-```
-
-Possible actions:
-
-- `MoveUp`
-- `MoveDown`
-- `MoveLeft`
-- `MoveRight`
-- `PlaceBomb`
-- `DoNothing`
-
-### CellType
-
-```go
-type CellType string
-```
-
-Possible values:
-
-- `Air`
-- `Wall`
-- `Box`
-
-### Position
-
-```go
-type Position struct {
-    X int
-    Y int
-}
-```
-
-Methods:
-
-- `DistanceTo(other Position) int`: Manhattan distance between two positions.
-
-### Player
-
-```go
-type Player struct {
-    ID     string
-    Pos    Position
-    Health int
-    Score  int
-}
-```
-
-### Bomb
-
-```go
-type Bomb struct {
-    Pos  Position
-    Fuse int
-}
-```
-
-### Field
-
-```go
-type Field struct {
-    Width  int
-    Height int
-    Cells  []CellType
-}
-```
-
-Methods:
-
-- `CellAt(pos Position) CellType`: Returns cell at `pos`, or `Wall` when out of bounds.
-
-### GameState
-
-```go
-type GameState struct {
-    CurrentTick int
-    Me          *Player
-    Opponents   []Player
-    Players     []Player
-    Field       Field
-    Bombs       []Bomb
-    Explosions  []Position
-}
-```
-
-Represents all data your bot receives for one tick.
-
-## GameHelpers API
-
-`GameHelpers` provides utility functions for pathing and safety checks.
-
-```go
-type GameHelpers struct {
-    State *GameState
-}
-```
-
-### IsWalkable
-
-```go
-func (h *GameHelpers) IsWalkable(pos Position) bool
-```
-
-Returns `true` if position:
-
-- Is inside board bounds.
-- Is not a `Wall`.
-- Is not a `Box`.
-- Is not currently occupied by a bomb.
-
-### GetAdjacentWalkablePositions
-
-```go
-func (h *GameHelpers) GetAdjacentWalkablePositions(pos Position) []Position
-```
-
-Returns walkable adjacent cells in this fixed order:
-
-- Up
-- Right
-- Down
-- Left
-
-### GetNextActionTowards
-
-```go
-func (h *GameHelpers) GetNextActionTowards(start, target Position) Action
-```
-
-Uses BFS pathfinding and returns the next movement action from `start` toward `target`.
-
-- Returns `DoNothing` if `start == target`.
-- Returns `DoNothing` if no valid path exists.
-
-### IsSafe
-
-```go
-func (h *GameHelpers) IsSafe(pos Position) bool
-```
-
-Returns `false` when:
-
-- Position is out of bounds.
-- Position currently has a bomb.
-- Position is in active explosion cells.
-- Position is in predicted blast range of bombs that will trigger now (`Fuse <= 1`) or by chain reaction.
-
-### GetNearestSafePosition
-
-```go
-func (h *GameHelpers) GetNearestSafePosition(start Position) Position
-```
-
-Finds closest safe and walkable cell with BFS.
-
-- Returns `start` if it is already safe.
-- Returns `start` if no safe reachable cell exists.
-
-### FindNearestBox
-
-```go
-func (h *GameHelpers) FindNearestBox(start Position) (Position, bool)
-```
-
-Finds nearest reachable `Box` tile.
-
-- BFS can traverse `Air` and `Box`.
-- BFS does not traverse through `Wall`.
-- Returns `found=false` when no box is reachable.
-
-## Complete Minimal Bot Example
-
-This example:
-
-- Escapes danger first.
-- Moves toward nearest box.
-- Places a bomb when standing next to a box.
-- Otherwise idles.
+Create `cmd/bot/main.go`:
 
 ```go
 package main
@@ -242,7 +42,7 @@ package main
 import (
 	"log"
 
-	"github.com/N3moAhead/bombahead-go"
+	bombahead "github.com/N3moAhead/bombahead-go"
 )
 
 type SimpleBot struct{}
@@ -279,23 +79,145 @@ func main() {
 }
 ```
 
-## Suggested Project Layout
+## 4. Learn the basic SDK concepts
 
-```text
-my-bot/
-  go.mod
-  cmd/
-    mybot/
-      main.go
+The only interface you must implement:
+
+```go
+type Bot interface {
+    GetNextMove(state *GameState, helpers *GameHelpers) Action
+}
 ```
 
-## Error Handling Notes
+Entry point:
 
-- `Run` logs and exits on connection failures or send failures.
-- Some malformed server payloads are logged and skipped, allowing loop continuation.
-- Unknown message types are ignored by design.
+```go
+func Run(userBot Bot)
+```
 
-## Compatibility
+`Run(...)` handles:
 
-- Module: `github.com/N3moAhead/bombahead-go`
-- Go version from this SDK: `go 1.23`
+- WebSocket connection
+- ready-state updates
+- state parsing each tick
+- helper construction
+- sending your returned action
+
+Important actions:
+
+- `MoveUp`
+- `MoveDown`
+- `MoveLeft`
+- `MoveRight`
+- `PlaceBomb`
+- `DoNothing`
+
+Useful helpers to start with:
+
+- `IsSafe(pos)`
+- `GetNearestSafePosition(pos)`
+- `FindNearestBox(pos)`
+- `GetNextActionTowards(start, target)`
+
+## 5. Run and test locally
+
+Run your bot:
+
+```bash
+go run ./cmd/bot
+```
+
+For a realistic local test, run server + a default opponent image, then your bot.
+
+Default images used by BombAhead tooling:
+
+- Server: `ghcr.io/n3moahead/bombahead/os-server:latest`
+- Opponent (aggressive): `ghcr.io/n3moahead/bomber:self-destruct`
+- Opponent (passive): `ghcr.io/n3moahead/bomber:idle`
+
+```bash
+# Terminal 1: game server
+docker run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/os-server:latest
+
+# Terminal 2: default opponent
+docker run --rm --network host ghcr.io/n3moahead/bomber:idle
+
+# Terminal 3: your bot from source
+go run ./cmd/bot
+```
+
+Your bot should connect to `ws://localhost:8038/ws`.
+
+## 6. Containerize your bot
+
+Create a `Dockerfile`:
+
+```dockerfile
+FROM docker.io/golang:1.25-alpine AS builder
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+RUN go build -o /app/bot ./cmd/bot/main.go
+
+FROM docker.io/alpine:latest
+WORKDIR /root/
+COPY --from=builder /app/bot .
+
+CMD ["./bot"]
+```
+
+Build locally:
+
+```bash
+docker build -t my-bombahead-go-bot:local .
+```
+
+## 7. Push to GitHub Container Registry (`ghcr.io`)
+
+Choose your final image name, for example:
+
+`ghcr.io/<github-username>/bombahead-go-bot:v1`
+
+Login:
+
+```bash
+echo <YOUR_GITHUB_PAT> | docker login ghcr.io -u <github-username> --password-stdin
+```
+
+Tag and push:
+
+```bash
+docker tag my-bombahead-go-bot:local ghcr.io/<github-username>/bombahead-go-bot:v1
+docker push ghcr.io/<github-username>/bombahead-go-bot:v1
+```
+
+<p><strong>Important:</strong> <code>ghcr.io</code> images are usually private by default. Make your package/image public, otherwise the BombAhead match runner cannot pull it and your matches will fail before game start.</p>
+
+GitHub visibility path (typical):
+
+- GitHub profile/org
+- Packages
+- Your container package
+- Package settings
+- Change visibility to <strong>Public</strong>
+
+## 8. Register bot on BombAhead
+
+After your image is public and pullable:
+
+1. Log in to BombAhead
+2. Open `/bots/new`
+3. Enter bot name + description
+4. Paste your image URL, e.g. `ghcr.io/<github-username>/bombahead-go-bot:v1`
+5. Save
+
+After that, BombAhead can schedule matches for your bot.
+
+## 9. Recommended next improvements
+
+- Add a bomb cooldown strategy (avoid placing bombs without an escape route).
+- Use `FindNearestBox` plus safety checks before path commits.
+- Version images (`v1`, `v2`, `v3`) instead of overwriting `latest`.

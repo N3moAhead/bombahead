@@ -1,0 +1,38 @@
+<article class="prose max-w-none docs-markdown">
+<h1 id="general-tips">General Tips</h1>
+<p>This page collects practical tips that help when building BombAhead bots.</p>
+<h2 id="coordinate-system">Coordinate system</h2>
+<p>When you receive a game state, the field starts at the <strong>top-left</strong> corner.</p>
+<ul>
+<li>Top-left is <code>(0,0)</code></li>
+<li><code>x</code> increases to the right</li>
+<li><code>y</code> increases downward</li>
+</ul>
+<h2 id="start-with-survival-first">Start with survival first</h2>
+<p>A stable baseline strategy is:</p>
+<ol>
+<li>If current position is unsafe, move to the nearest safe tile.</li>
+<li>Otherwise, move toward a useful target (for example the nearest box or player).</li>
+<li>If no safe/useful action exists, use <code>DO_NOTHING</code>.</li>
+</ol>
+<h2 id="avoid-risky-bomb-placements">Avoid risky bomb placements</h2>
+<p>Do not place bombs unless you have a clear escape route. Many early bots lose because they trap themselves.</p>
+<h2 id="validate-with-local-matches">Validate with local matches</h2>
+<p>Before pushing new versions, run local matches against baseline opponents. This catches regressions early.</p>
+<p>Common baseline images:</p>
+<ul>
+<li><code>ghcr.io/n3moahead/bomber:idle</code> Is just ideling</li>
+<li><code>ghcr.io/n3moahead/bomber:self-destruct</code> Commits suicide</li>
+<li><code>ghcr.io/n3moahead/bomber:simple-max-v1</code> A simple but worthy opponent</li>
+</ul>
+<h2 id="version-your-images">Version your images</h2>
+<p>Use explicit tags like <code>:v1</code>, <code>:v2</code>, <code>:v3</code> instead of overwriting <code>:latest</code>. This makes rollbacks and result comparisons much easier.</p>
+<h2 id="keep-images-pullable">Keep images pullable</h2>
+<p>The match runner must be able to pull your image.</p>
+<ul>
+<li>Make sure repository and tag exist.</li>
+<li>For <code>ghcr.io</code>, set package visibility to public if required.</li>
+<li>Use fully qualified image references.</li>
+</ul>
+
+</article>

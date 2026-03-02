@@ -13,7 +13,14 @@ templ Doc(user *models.User, csrfToken string, docHTML string, currentSlug strin
 					<ul class="menu bg-base-200 rounded-box p-4 w-full text-base-content shadow-xl border border-base-300">
 						<li><h2 class="menu-title text-lg font-semibold text-base-content">Documentation</h2></li>
 						<li><a href="/docs/index" class={ templ.KV("menu-active", currentSlug == "index") }>Introduction</a></li>
-						<li><a href="/docs/GolangSDK" class={ templ.KV("menu-active", currentSlug == "GolangSDK") }>Golang SDK</a></li>
+						<li><a href="/docs/GeneralTips" class={ templ.KV("menu-active", currentSlug == "GeneralTips") }>General Tips</a></li>
+						<li><h2 class="menu-title text-m font-semibold text-base-content">SDK's</h2></li>
+						<li>
+							<ul>
+								<li><a href="/docs/GolangSDK" class={ templ.KV("menu-active", currentSlug == "GolangSDK") }>Go Bot</a></li>
+								<li><a href="/docs/TypeScriptSDK" class={ templ.KV("menu-active", currentSlug == "TypeScriptSDK") }>Typescript Bot</a></li>
+							</ul>
+						</li>
 					</ul>
 				</div>
 			</aside>

@@ -1,5 +1,82 @@
 <article class="prose max-w-none docs-markdown">
-<h1 id="bombahead-documentation">BombAhead Documentation</h1>
-<p>Hey welcome</p>
+<h1 id="bombahead">BombAhead</h1>
+<p>Welcome to BombAhead.</p>
+<p>BombAhead is a bot competition platform for a Bomberman-style game. You write a bot with an SDK, package it as a container image, push that image to a registry, register it on the platform, and then it plays ranked matches against other bots.</p>
+<h2 id="important-use-sdks-not-legacy-examples">Important: use SDKs, not legacy examples</h2>
+<p>The folders <code>client_go/</code>, <code>client_js/</code>, and <code>client_rust/</code> in this repository are legacy examples and can be outdated.</p>
+<p>For new bots, use the current SDKs.</p>
+<h2 id="competition-flow">Competition flow</h2>
+<ol>
+<li>Build your bot with an SDK</li>
+<li>Test locally against the game server</li>
+<li>Build a container image for your bot</li>
+<li>Push the image to a public registry</li>
+<li>Add the image in BombAhead (<code>/bots/new</code>)</li>
+<li>Let the platform schedule matches and track results</li>
+</ol>
+<h2 id="what-your-bot-container-must-do">What your bot container must do</h2>
+<p>At runtime, your container should start your bot process immediately.</p>
+<p>Your bot should:</p>
+<ul>
+<li>Connect to <code>ws://localhost:8038/ws</code></li>
+<li>Send <code>player_status_update</code> (<code>isReady: true</code>) after connecting</li>
+<li>Read game state messages and send actions every tick</li>
+<li>Support the <code>BOMBERMAN_CLIENT_AUTH_TOKEN</code> env var (SDKs handle this)</li>
+</ul>
+<p>The match runner starts server and bot containers in one pod/network namespace, so <code>localhost:8038</code> is correct inside bot containers.</p>
+<h2 id="build-and-push-your-image">Build and push your image</h2>
+<p>Example (Docker):</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>docker build -t docker.io/&lt;username&gt;/&lt;bot-name&gt;:&lt;tag&gt; .
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>docker login docker.io
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>docker push docker.io/&lt;username&gt;/&lt;bot-name&gt;:&lt;tag&gt;
+</span></span></code></pre><p>Example (Podman):</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>podman build -t docker.io/&lt;username&gt;/&lt;bot-name&gt;:&lt;tag&gt; .
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>podman login docker.io
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>podman push docker.io/&lt;username&gt;/&lt;bot-name&gt;:&lt;tag&gt;
+</span></span></code></pre><p>You can also use <code>ghcr.io/...</code> images.</p>
+<h2 id="register-your-bot-on-the-platform">Register your bot on the platform</h2>
+<p>In BombAhead:</p>
+<ol>
+<li>Log in</li>
+<li>Open <code>/bots/new</code></li>
+<li>Fill in:
+<ul>
+<li>Bot name (required, max 30 chars)</li>
+<li>Description (optional, max 500 chars)</li>
+<li>Image URL (required), for example <code>docker.io/&lt;username&gt;/&lt;bot-name&gt;:&lt;tag&gt;</code></li>
+</ul>
+</li>
+<li>Save</li>
+</ol>
+<h2 id="image-requirements-critical">Image requirements (critical)</h2>
+<p>Your image reference must be pullable by the match runner.</p>
+<ul>
+<li>Use a correct, fully qualified image name</li>
+<li>Ensure the repository/tag exists</li>
+<li>Ensure the image is public or otherwise accessible to the runner environment</li>
+<li>Avoid registry pull-rate issues (anonymous Docker Hub pulls can be limited)</li>
+</ul>
+<p>If an image cannot be pulled, matches will fail before game start.</p>
+<h2 id="local-testing">Local testing</h2>
+<p>You can test locally by running:</p>
+<ul>
+<li>a server container</li>
+<li>one dummy opponent bot container</li>
+<li>your own bot</li>
+</ul>
+<p>This validates connection handling, move loop, and basic behavior before pushing.</p>
+<h2 id="after-pushing-where-to-look">After pushing: where to look</h2>
+<ul>
+<li><code>/bots</code> for your bot list</li>
+<li><code>/bots/{id}</code> for bot details and per-bot match history</li>
+<li><code>/matches</code> for global match list</li>
+<li><code>/matches/{matchID}</code> for replay/history details</li>
+</ul>
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Matches are generated by the platform and processed asynchronously.</li>
+<li>Ratings/leaderboard update from match results.</li>
+<li>Keep tags immutable for reproducibility (for example <code>:v1.2.0</code> instead of always <code>:latest</code>).</li>
+</ul>
 
 </article>
