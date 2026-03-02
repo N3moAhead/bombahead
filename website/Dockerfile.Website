@@ -14,7 +14,7 @@ COPY . .
 
 RUN go tool templ generate
 RUN go run cmd/generate_docs/main.go
-RUN npx tailwindcss -i ./static/css/app.css -o ./static/css/dist.css --minify
+RUN npx @tailwindcss/cli -i ./static/css/app.css -o ./static/css/dist.css --minify
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /website ./cmd/website/main.go
 
