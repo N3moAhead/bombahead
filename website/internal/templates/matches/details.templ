@@ -56,6 +56,7 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
       const history = JSON.parse(
         JSON.parse(historyInput.getAttribute("history-data")),
       );
+      console.log(history)
 
       const bot1Name = "{{ vm.Match.Bot1.Name }}";
       const bot2Name = "{{ vm.Match.Bot2.Name }}";
@@ -567,9 +568,16 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
         });
       }
 
-      function drawDestroyedBoxes(boxes, field) {
-        boxes.forEach((box) => {
-          field[box.y * fieldWidth + box.x] = " ";
+      const fieldStates = [];
+      if (history.ticks && history.ticks.length > 0) {
+        let currentField = [...history.initial_field.field];
+        history.ticks.forEach(tick => {
+          if (tick.destroyed_boxes) {
+            tick.destroyed_boxes.forEach(box => {
+              currentField[box.y * fieldWidth + box.x] = "AIR";
+            });
+          }
+          fieldStates.push([...currentField]);
         });
       }
 
@@ -581,14 +589,8 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
         const tick = history.ticks[tickIndex];
         if (!tick) return;
 
-        // Rebuild field state up to the current tick
-        let field = [...history.initial_field.field];
-        for (let i = 0; i <= tickIndex; i++) {
-          const pastTick = history.ticks[i];
-          if (pastTick.destroyed_boxes) {
-            drawDestroyedBoxes(pastTick.destroyed_boxes, field);
-          }
-        }
+        // Use precalculated field state for this tick
+        let field = fieldStates[tickIndex] || history.initial_field.field;
 
         drawField(field);
         drawPlayers(tick.players);
