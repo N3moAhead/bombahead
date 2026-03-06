@@ -6,7 +6,7 @@ const (
 	// --- Field ---
 	field_width    = 11
 	field_height   = 11
-	box_spawn_rate = 0.75
+	box_spawn_rate = 75
 
 	// --- Bombs ---
 	fuse_ticks            = 10
