@@ -171,8 +171,8 @@ func (c *Classic) getGameState() ClassicStatePayload {
 
 	// Get Field
 	field := []Tile{}
-	for x := range field_width {
-		for y := range field_height {
+	for y := range field_height {
+		for x := range field_width {
 			field = append(field, c.field.getTile(x, y))
 		}
 	}
