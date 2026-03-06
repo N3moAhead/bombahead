@@ -85,9 +85,9 @@ func (c *Classic) AddPlayer(player game.Player) error {
 	// We define the spawn points for the players in the corners of the map
 	spawnPoints := []types.Vec2{
 		types.NewVec2(1, 1),                          // Top-Left
+		types.NewVec2(field_width-2, field_height-2), // Bottom-Right
 		types.NewVec2(field_width-2, 1),              // Top-Right
 		types.NewVec2(1, field_height-2),             // Bottom-Left
-		types.NewVec2(field_width-2, field_height-2), // Bottom-Right
 	}
 
 	// Assign a spawn point based on the number of players already in the game.
