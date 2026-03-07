@@ -46,7 +46,7 @@ func Doc(user *models.User, csrfToken string, docHTML string, currentSlug string
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8\"><aside class=\"w-full lg:w-64 shrink-0\"><div class=\"sticky top-8\"><ul class=\"menu bg-base-200 rounded-box p-4 w-full text-base-content shadow-xl border border-base-300\"><li><h2 class=\"menu-title text-lg font-semibold text-base-content\">Documentation</h2></li><li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"container mx-auto px-4 py-8 flex flex-col lg:flex-row gap-8\"><aside class=\"w-full lg:w-64 shrink-0\"><div class=\"sticky top-24\"><ul class=\"menu bg-base-200 rounded-box p-4 w-full text-base-content shadow-xl border border-base-300\"><li><h2 class=\"menu-title text-lg font-semibold text-base-content\">Documentation</h2></li><li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -3,7 +3,7 @@ package navbar
 import "github.com/N3moAhead/bombahead/website/internal/models"
 
 templ Navbar(csrfToken string, user *models.User) {
-	<div class="navbar bg-base-100 shadow-sm">
+	<div class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
 	  <div class="navbar-start">
 	    <div class="dropdown">
 	      <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
