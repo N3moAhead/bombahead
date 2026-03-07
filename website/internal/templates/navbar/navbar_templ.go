@@ -77,7 +77,7 @@ func Navbar(csrfToken string, user *models.User) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a href=\"/auth/github\" class=\"btn btn-primary\">Login with Github</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a href=\"/auth/github\" class=\"btn btn-primary\">Login<span class=\"hidden sm:inline\">&nbsp;with Github</span></a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -29,7 +29,7 @@ func heroSection() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"hero min-h-screen bg-base-200\"><div class=\"container mx-auto px-4\"><div class=\"hero-content flex-col lg:flex-row-reverse\"><img src=\"/static/images/game_example_image.png\" class=\"max-w-sm rounded-lg shadow-2xl\" alt=\"Bomberman Gameplay\"><div><h1 class=\"text-5xl font-bold\">Welcome to BombAhead!</h1><p class=\"py-6\">A simple Bomberman Bot competition plattform. Write your own Bot, compete against others, and climb the leaderboard. Just have some fun!</p><a href=\"#getting-started\" class=\"btn btn-outline btn-primary\">Get Started</a></div></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"hero min-h-screen bg-base-200\"><div class=\"container mx-auto px-4\"><div class=\"hero-content flex-col lg:flex-row-reverse\"><img src=\"/static/images/game_example_image.png\" class=\"w-full max-w-sm rounded-lg shadow-2xl\" alt=\"Bomberman Gameplay\"><div><h1 class=\"text-5xl font-bold\">Welcome to BombAhead!</h1><p class=\"py-6\">A simple Bomberman Bot competition plattform. Write your own Bot, compete against others, and climb the leaderboard. Just have some fun!</p><a href=\"#getting-started\" class=\"btn btn-outline btn-primary\">Get Started</a></div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
