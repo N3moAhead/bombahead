@@ -131,13 +131,13 @@ For a realistic local test, run server + a default opponent image, then your bot
 
 Default images used by BombAhead tooling:
 
-- Server: `ghcr.io/n3moahead/bombahead/os-server:latest`
+- Server: `ghcr.io/n3moahead/bombahead/server:latest`
 - Opponent (aggressive): `ghcr.io/n3moahead/bomber:self-destruct`
 - Opponent (passive): `ghcr.io/n3moahead/bomber:idle`
 
 ```bash
 # Terminal 1: game server
-docker run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/os-server:latest
+docker run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/server:latest
 
 # Terminal 2: default opponent
 docker run --rm --network host ghcr.io/n3moahead/bomber:idle
