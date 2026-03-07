@@ -31,23 +31,22 @@ func (c *Classic) applyPlayerInput() {
 		switch player.NextMove {
 		case MOVE_UP:
 			newPos := player.Pos.Add(types.Vec2{X: 0, Y: -1})
-			// TODO Check if the tile contains a bomb the player can't walk over bombs
-			if !c.field.isTileBlocked(newPos.X, newPos.Y) {
+			if !c.isWalkable(newPos) {
 				player.Pos = newPos
 			}
 		case MOVE_RIGHT:
 			newPos := player.Pos.Add(types.Vec2{X: 1, Y: 0})
-			if !c.field.isTileBlocked(newPos.X, newPos.Y) {
+			if !c.isWalkable(newPos) {
 				player.Pos = newPos
 			}
 		case MOVE_DOWN:
 			newPos := player.Pos.Add(types.Vec2{X: 0, Y: 1})
-			if !c.field.isTileBlocked(newPos.X, newPos.Y) {
+			if !c.isWalkable(newPos) {
 				player.Pos = newPos
 			}
 		case MOVE_LEFT:
 			newPos := player.Pos.Add(types.Vec2{X: -1, Y: 0})
-			if !c.field.isTileBlocked(newPos.X, newPos.Y) {
+			if !c.isWalkable(newPos) {
 				player.Pos = newPos
 			}
 		case PLACE_BOMB:
@@ -60,6 +59,10 @@ func (c *Classic) applyPlayerInput() {
 			// or the user has not defined input move
 		}
 	}
+}
+
+func (c *Classic) isWalkable(pos types.Vec2) bool {
+	return c.field.isTileBlocked(pos.X, pos.Y) || c.containsBomb(pos)
 }
 
 func (c *Classic) updateBombs() []types.Vec2 {
