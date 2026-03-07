@@ -1,0 +1,153 @@
+<article class="prose max-w-none docs-markdown">
+<h1 id="python-bot-tutorial">Python Bot Tutorial</h1>
+<p>This guide shows how to build a minimal BombAhead bot with Python, test it locally, package it as a container image, and push it to <code>ghcr.io</code> so you can register it on the platform later.</p>
+<p><strong>Note:</strong> This page is a practical tutorial. For detailed API reference, consult the SDK's source or README.</p>
+<h2 id="1-prerequisites">1. Prerequisites</h2>
+<ul>
+<li>Python 3.10+</li>
+<li>Docker</li>
+<li>A GitHub account (for <code>ghcr.io</code>)</li>
+</ul>
+<p>Podman works as well. You can replace <code>docker</code> with <code>podman</code> in the commands below.</p>
+<h2 id="2-create-a-new-bot-project">2. Create a new bot project</h2>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>mkdir my-bombahead-py-bot
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span><span style="color:#8be9fd;font-style:italic">cd</span> my-bombahead-py-bot
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>python3 -m venv venv
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#8be9fd;font-style:italic">source</span> venv/bin/activate
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>pip install bombahead-py
+</span></span></code></pre><p>Recommended structure:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>my-bombahead-py-bot/
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>  bot.py
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>  requirements.txt
+</span></span></code></pre><p>Create a <code>requirements.txt</code>:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>bombahead-py
+</span></span></code></pre><h2 id="3-write-a-minimal-bot">3. Write a minimal bot</h2>
+<p>Create <code>bot.py</code>:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#ff79c6">from</span> bombahead <span style="color:#ff79c6">import</span> Action, Bot, GameHelpers, GameState, run
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#ff79c6">class</span> <span style="color:#50fa7b">SimpleBot</span>(Bot):
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>    <span style="color:#ff79c6">def</span> <span style="color:#50fa7b">get_next_move</span>(<span style="font-style:italic">self</span>, state: GameState, helpers: GameHelpers) <span style="color:#ff79c6">-&gt;</span> Action:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span>        <span style="color:#6272a4"># If our bot is not initialized or dead, do nothing</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span>        <span style="color:#ff79c6">if</span> <span style="color:#ff79c6">not</span> state<span style="color:#ff79c6">.</span>me:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>            <span style="color:#ff79c6">return</span> Action<span style="color:#ff79c6">.</span>DO_NOTHING
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>        me_pos <span style="color:#ff79c6">=</span> state<span style="color:#ff79c6">.</span>me<span style="color:#ff79c6">.</span>pos
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11</span><span>        <span style="color:#6272a4"># If our tile is unsafe, move to the nearest safe tile.</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12</span><span>        <span style="color:#ff79c6">if</span> <span style="color:#ff79c6">not</span> helpers<span style="color:#ff79c6">.</span>is_safe(me_pos):
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13</span><span>            safe_pos <span style="color:#ff79c6">=</span> helpers<span style="color:#ff79c6">.</span>get_nearest_safe_position(me_pos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14</span><span>            <span style="color:#ff79c6">return</span> helpers<span style="color:#ff79c6">.</span>get_next_action_towards(me_pos, safe_pos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16</span><span>        <span style="color:#6272a4"># Otherwise move toward the nearest box.</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17</span><span>        box_pos, found <span style="color:#ff79c6">=</span> helpers<span style="color:#ff79c6">.</span>find_nearest_box(me_pos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18</span><span>        <span style="color:#ff79c6">if</span> found:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19</span><span>            dist <span style="color:#ff79c6">=</span> me_pos<span style="color:#ff79c6">.</span>distance_to(box_pos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20</span><span>            <span style="color:#ff79c6">if</span> dist <span style="color:#ff79c6">==</span> <span style="color:#bd93f9">1</span>:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21</span><span>                <span style="color:#ff79c6">return</span> Action<span style="color:#ff79c6">.</span>PLACE_BOMB
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22</span><span>            <span style="color:#ff79c6">if</span> dist <span style="color:#ff79c6">&gt;</span> <span style="color:#bd93f9">1</span>:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23</span><span>                <span style="color:#ff79c6">return</span> helpers<span style="color:#ff79c6">.</span>get_next_action_towards(me_pos, box_pos)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25</span><span>        <span style="color:#ff79c6">return</span> Action<span style="color:#ff79c6">.</span>DO_NOTHING
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27</span><span><span style="color:#ff79c6">if</span> <span style="color:#8be9fd;font-style:italic">__name__</span> <span style="color:#ff79c6">==</span> <span style="color:#f1fa8c">&#34;__main__&#34;</span>:
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28</span><span>    <span style="color:#8be9fd;font-style:italic">print</span>(<span style="color:#f1fa8c">&#34;Starting SimpleBot...&#34;</span>)
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29</span><span>    run(SimpleBot())
+</span></span></code></pre><h2 id="4-learn-the-basic-sdk-concepts">4. Learn the basic SDK concepts</h2>
+<p>The architecture of the SDK is built around a simple reactive event loop. Your bot operates as an asynchronous callback invoked upon receiving a state update from the server.</p>
+<p>The only interface you must implement is the <code>Bot</code> protocol:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#ff79c6">class</span> <span style="color:#50fa7b">Bot</span>(Protocol):
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>    <span style="color:#ff79c6">def</span> <span style="color:#50fa7b">get_next_move</span>(<span style="font-style:italic">self</span>, state: GameState, helpers: GameHelpers) <span style="color:#ff79c6">-&gt;</span> Action: <span style="color:#ff79c6">...</span>
+</span></span></code></pre><p>Entry point:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>run(bot)
+</span></span></code></pre><p><code>run(...)</code> handles:</p>
+<ul>
+<li>WebSocket connection</li>
+<li>ready-state updates</li>
+<li>state parsing each tick</li>
+<li>helper construction</li>
+<li>sending your returned action</li>
+</ul>
+<p>Important actions (<code>Action</code> enum):</p>
+<ul>
+<li><code>Action.MOVE_UP</code></li>
+<li><code>Action.MOVE_DOWN</code></li>
+<li><code>Action.MOVE_LEFT</code></li>
+<li><code>Action.MOVE_RIGHT</code></li>
+<li><code>Action.PLACE_BOMB</code></li>
+<li><code>Action.DO_NOTHING</code></li>
+</ul>
+<p>Useful helpers to start with (<code>GameHelpers</code>):</p>
+<ul>
+<li><code>is_safe(pos)</code></li>
+<li><code>get_nearest_safe_position(pos)</code></li>
+<li><code>find_nearest_box(pos)</code></li>
+<li><code>get_next_action_towards(start, target)</code></li>
+</ul>
+<h2 id="5-run-and-test-locally">5. Run and test locally</h2>
+<p>Run your bot:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>python bot.py
+</span></span></code></pre><p>For a realistic local test, run server + a default opponent image, then your bot.</p>
+<p>Default images used by BombAhead tooling:</p>
+<ul>
+<li>Server: <code>ghcr.io/n3moahead/bombahead/os-server:latest</code></li>
+<li>Opponent (aggressive): <code>ghcr.io/n3moahead/bomber:self-destruct</code></li>
+<li>Opponent (passive): <code>ghcr.io/n3moahead/bomber:idle</code></li>
+</ul>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#6272a4"># Terminal 1: game server</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>docker run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/os-server:latest
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#6272a4"># Terminal 2: default opponent</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>docker run --rm --network host ghcr.io/n3moahead/bomber:idle
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7</span><span><span style="color:#6272a4"># Terminal 3: your bot from source</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8</span><span>python bot.py
+</span></span></code></pre><p>Your bot should connect to <code>ws://localhost:8038/ws</code>.</p>
+<h2 id="6-containerize-your-bot">6. Containerize your bot</h2>
+<p>Create a <code>Dockerfile</code>:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1</span><span><span style="color:#ff79c6">FROM</span> <span style="color:#f1fa8c">python:3.12-slim</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3</span><span><span style="color:#ff79c6">WORKDIR</span> <span style="color:#f1fa8c">/app</span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5</span><span><span style="color:#ff79c6">COPY</span> requirements.txt .
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6</span><span><span style="color:#ff79c6">RUN</span> pip install --no-cache-dir -r requirements.txt
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8</span><span><span style="color:#ff79c6">COPY</span> bot.py .
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9</span><span>
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10</span><span><span style="color:#ff79c6">CMD</span> [<span style="color:#f1fa8c">&#34;python&#34;</span>, <span style="color:#f1fa8c">&#34;bot.py&#34;</span>]
+</span></span></code></pre><p>Build locally:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>docker build -t my-bombahead-py-bot:local .
+</span></span></code></pre><h2 id="7-push-to-github-container-registry-ghcrio">7. Push to GitHub Container Registry (<code>ghcr.io</code>)</h2>
+<p>Choose your final image name, for example:</p>
+<p><code>ghcr.io/&lt;github-username&gt;/bombahead-py-bot:v1</code></p>
+<p>Login:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#8be9fd;font-style:italic">echo</span> &lt;YOUR_GITHUB_PAT&gt; | docker login ghcr.io -u &lt;github-username&gt; --password-stdin
+</span></span></code></pre><p>Tag and push:</p>
+<pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span>docker tag my-bombahead-py-bot:local ghcr.io/&lt;github-username&gt;/bombahead-py-bot:v1
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>docker push ghcr.io/&lt;github-username&gt;/bombahead-py-bot:v1
+</span></span></code></pre><p><strong>Important:</strong> <code>ghcr.io</code> images are usually private by default. Make your package/image public, otherwise the BombAhead match runner cannot pull it and your matches will fail before game start.</p>
+<p>GitHub visibility path (typical):</p>
+<ul>
+<li>GitHub profile/org</li>
+<li>Packages</li>
+<li>Your container package</li>
+<li>Package settings</li>
+<li>Change visibility to <strong>Public</strong></li>
+</ul>
+<h2 id="8-register-bot-on-bombahead">8. Register bot on BombAhead</h2>
+<p>After your image is public and pullable:</p>
+<ol>
+<li>Log in to BombAhead</li>
+<li>Open <code>/bots/new</code></li>
+<li>Enter bot name + description</li>
+<li>Paste your image URL, e.g. <code>ghcr.io/&lt;github-username&gt;/bombahead-py-bot:v1</code></li>
+<li>Save</li>
+</ol>
+<p>After that, BombAhead can schedule matches for your bot.</p>
+<h2 id="9-recommended-next-improvements">9. Recommended next improvements</h2>
+<ul>
+<li>Add a bomb cooldown strategy (avoid placing bombs without an escape route).</li>
+<li>Use <code>find_nearest_box</code> plus safety checks before path commits.</li>
+<li>Version images (<code>v1</code>, <code>v2</code>, <code>v3</code>) instead of overwriting <code>latest</code>.</li>
+</ul>
+
+</article>
