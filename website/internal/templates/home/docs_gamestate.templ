@@ -4,11 +4,11 @@ templ gamestate() {
 	<div class="collapse collapse-arrow bg-base-100 border border-base-300 shadow-md">
     <input type="checkbox" checked />
     <div class="collapse-title text-xl font-medium text-primary">
-        Game State API Reference
+        SDK Game State Reference
     </div>
     <div class="collapse-content overflow-x-auto">
         <div class="prose max-w-none pt-4">
-            <p>Every game tick, your bot receives a <code>state</code> object. It contains the complete map and all active entities.</p>
+            <p>Every game tick, the SDK invokes your bot with a <code>GameState</code> object and a set of useful <code>GameHelpers</code>. Below is a conceptual JSON representation of the <code>GameState</code> that your bot evaluates.</p>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
 
@@ -21,60 +21,65 @@ templ gamestate() {
 
                     <div class="mockup-code bg-neutral text-neutral-content text-sm" id="json-state">
                         <pre data-prefix="1"><code>&lbrace;</code></pre>
-                        <pre data-prefix="2"><code>&nbsp;&nbsp;<span class="text-secondary">"players"</span>: [</code></pre>
-                        <pre data-prefix="3"><code>&nbsp;&nbsp;&nbsp;&nbsp;&lbrace;</code></pre>
-                        <pre data-prefix="4"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"id"</span>: <span class="text-success">"bda20cd7-..."</span>,</code></pre>
-                        <pre data-prefix="5"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"pos"</span>: &lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">1</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">1</span> &rbrace;,</code></pre>
-                        <pre data-prefix="6"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"health"</span>: <span class="text-warning">3</span>,</code></pre>
-                        <pre data-prefix="7"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"score"</span>: <span class="text-warning">0</span></code></pre>
-                        <pre data-prefix="8"><code>&nbsp;&nbsp;&nbsp;&nbsp;&rbrace;</code></pre>
-                        <pre data-prefix="9"><code>&nbsp;&nbsp;],</code></pre>
-                        <pre data-prefix="10"><code>&nbsp;&nbsp;<span class="text-secondary">"field"</span>: &lbrace;</code></pre>
-                        <pre data-prefix="11"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"width"</span>: <span class="text-warning">11</span>,</code></pre>
-                        <pre data-prefix="12"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"height"</span>: <span class="text-warning">11</span>,</code></pre>
-                        <pre data-prefix="13"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"field"</span>: [<span class="text-success">"WALL"</span>, <span class="text-success">"AIR"</span>, <span class="text-success">"BOX"</span>, ...]</code></pre>
-                        <pre data-prefix="14"><code>&nbsp;&nbsp;&rbrace;,</code></pre>
-                        <pre data-prefix="15"><code>&nbsp;&nbsp;<span class="text-secondary">"bombs"</span>: [</code></pre>
-                        <pre data-prefix="16"><code>&nbsp;&nbsp;&nbsp;&nbsp;&lbrace;</code></pre>
-                        <pre data-prefix="17"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"pos"</span>: &lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">4</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">3</span> &rbrace;,</code></pre>
-                        <pre data-prefix="18"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"fuse"</span>: <span class="text-warning">5</span></code></pre>
-                        <pre data-prefix="19"><code>&nbsp;&nbsp;&nbsp;&nbsp;&rbrace;</code></pre>
-                        <pre data-prefix="20"><code>&nbsp;&nbsp;],</code></pre>
-                        <pre data-prefix="21"><code>&nbsp;&nbsp;<span class="text-secondary">"explosions"</span>: [</code></pre>
-                        <pre data-prefix="22"><code>&nbsp;&nbsp;&nbsp;&nbsp;&lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">2</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">5</span> &rbrace;</code></pre>
-                        <pre data-prefix="23"><code>&nbsp;&nbsp;]</code></pre>
-                        <pre data-prefix="24"><code>&rbrace;</code></pre>
+                        <pre data-prefix="2"><code>&nbsp;&nbsp;<span class="text-secondary">"currentTick"</span>: <span class="text-warning">42</span>,</code></pre>
+                        <pre data-prefix="3"><code>&nbsp;&nbsp;<span class="text-secondary">"me"</span>: &lbrace;</code></pre>
+                        <pre data-prefix="4"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"id"</span>: <span class="text-success">"bda20cd7-..."</span>,</code></pre>
+                        <pre data-prefix="5"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"pos"</span>: &lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">1</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">1</span> &rbrace;,</code></pre>
+                        <pre data-prefix="6"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"health"</span>: <span class="text-warning">3</span>,</code></pre>
+                        <pre data-prefix="7"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"score"</span>: <span class="text-warning">0</span></code></pre>
+                        <pre data-prefix="8"><code>&nbsp;&nbsp;&rbrace;,</code></pre>
+                        <pre data-prefix="9"><code>&nbsp;&nbsp;<span class="text-secondary">"opponents"</span>: [</code></pre>
+                        <pre data-prefix="10"><code>&nbsp;&nbsp;&nbsp;&nbsp;&lbrace;</code></pre>
+                        <pre data-prefix="11"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"id"</span>: <span class="text-success">"c7e41f9a-..."</span>,</code></pre>
+                        <pre data-prefix="12"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"pos"</span>: &lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">9</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">9</span> &rbrace;,</code></pre>
+                        <pre data-prefix="13"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"health"</span>: <span class="text-warning">3</span>,</code></pre>
+                        <pre data-prefix="14"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"score"</span>: <span class="text-warning">10</span></code></pre>
+                        <pre data-prefix="15"><code>&nbsp;&nbsp;&nbsp;&nbsp;&rbrace;</code></pre>
+                        <pre data-prefix="16"><code>&nbsp;&nbsp;],</code></pre>
+                        <pre data-prefix="17"><code>&nbsp;&nbsp;<span class="text-secondary">"players"</span>: [ <span class="opacity-50">/* me + opponents */</span> ],</code></pre>
+                        <pre data-prefix="18"><code>&nbsp;&nbsp;<span class="text-secondary">"field"</span>: &lbrace;</code></pre>
+                        <pre data-prefix="19"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"width"</span>: <span class="text-warning">11</span>,</code></pre>
+                        <pre data-prefix="20"><code>&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"height"</span>: <span class="text-warning">11</span></code></pre>
+                        <pre data-prefix="21"><code>&nbsp;&nbsp;&rbrace;,</code></pre>
+                        <pre data-prefix="22"><code>&nbsp;&nbsp;<span class="text-secondary">"bombs"</span>: [</code></pre>
+                        <pre data-prefix="23"><code>&nbsp;&nbsp;&nbsp;&nbsp;&lbrace;</code></pre>
+                        <pre data-prefix="24"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"pos"</span>: &lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">4</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">3</span> &rbrace;,</code></pre>
+                        <pre data-prefix="25"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="text-secondary">"fuse"</span>: <span class="text-warning">5</span></code></pre>
+                        <pre data-prefix="26"><code>&nbsp;&nbsp;&nbsp;&nbsp;&rbrace;</code></pre>
+                        <pre data-prefix="27"><code>&nbsp;&nbsp;],</code></pre>
+                        <pre data-prefix="28"><code>&nbsp;&nbsp;<span class="text-secondary">"explosions"</span>: [</code></pre>
+                        <pre data-prefix="29"><code>&nbsp;&nbsp;&nbsp;&nbsp;&lbrace; <span class="text-secondary">"x"</span>: <span class="text-warning">2</span>, <span class="text-secondary">"y"</span>: <span class="text-warning">5</span> &rbrace;</code></pre>
+                        <pre data-prefix="30"><code>&nbsp;&nbsp;]</code></pre>
+                        <pre data-prefix="31"><code>&rbrace;</code></pre>
                     </div>
                 </div>
 
                 <!-- Right Column: Explanations -->
                 <div class="space-y-6">
                     <div class="border-l-4 border-secondary pl-4">
-                        <h4 class="font-bold text-secondary">players []</h4>
-                        <p class="text-sm">List of all bots. Use the <code>id</code> to find your own bot. <code>pos</code> is the current grid position.</p>
+                        <h4 class="font-bold text-secondary">Players</h4>
+                        <p class="text-sm">
+                            <code>me</code> contains your bot's status (ID, position, health, and score).
+                            <code>opponents</code> lists the other active bots.
+                            <code>players</code> is a combined list of all alive entities.
+                        </p>
                     </div>
 
                     <div class="border-l-4 border-secondary pl-4">
-                        <h4 class="font-bold text-secondary">field {}</h4>
+                        <h4 class="font-bold text-secondary">The Field</h4>
                         <p class="text-sm">
-                            The map. The <code>field</code> array is <strong>1-dimensional</strong>.
-                            To find a tile at (x, y), use: <br/>
-                            <code class="bg-base-200 px-1 rounded">index = y * width + x</code>
+                            The map uses a 2D coordinate system where <code>(0,0)</code> is the top-left corner. The map consists of indestructible <strong>WALLs</strong>, destructible <strong>BOXes</strong>, and walkable <strong>AIR</strong>. You can evaluate cells using <code>helpers.is_walkable(pos)</code>.
                         </p>
-                        <div class="flex gap-2 mt-2">
-                            <span class="badge badge-outline badge-sm text-xs opacity-70">WALL: Indestructible</span>
-                            <span class="badge badge-outline badge-sm text-xs opacity-70">BOX: Destructible</span>
-                        </div>
                     </div>
 
                     <div class="border-l-4 border-warning pl-4">
-                        <h4 class="font-bold text-warning">bombs []</h4>
-                        <p class="text-sm">A list of active bombs on the map. The <code>fuse</code> represents the remaining game ticks until detonation (starting at 9 and exploding at 0). Each explosion extends 2 tiles from the center, destroying a single box in its path while being blocked by walls. Note: Explosions can trigger chain reactions by detonating other bombs in their range.</p>
+                        <h4 class="font-bold text-warning">Bombs & Chain Reactions</h4>
+                        <p class="text-sm">Active bombs have a <code>fuse</code> that ticks down to 0. Each explosion extends 2 tiles from the center, destroying a single box in its path while being blocked by walls. Explosions trigger chain reactions by detonating other bombs in their range.</p>
                     </div>
 
                     <div class="border-l-4 border-error pl-4">
-                        <h4 class="font-bold text-error">explosions []</h4>
-                        <p class="text-sm">Danger zones! These coordinates indicate active fire. Any bot present at these coordinates during the current tick will lose health. However, since explosions dissipate after exactly one tick, you can safely move into a exploding tile. By the time your bot arrives in the next tick, the fire will already be gone.</p>
+                        <h4 class="font-bold text-error">Explosions</h4>
+                        <p class="text-sm">Danger zones! These coordinates indicate active fire. Any bot present at these coordinates during the current tick loses health. Explosions dissipate after exactly one tick.</p>
                     </div>
                 </div>
             </div>

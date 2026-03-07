@@ -8,7 +8,7 @@ templ localTesting() {
 				<h3 id="local-testing" class="card-title text-2xl">Testing Your Bot Locally</h3>
 			</div>
 			<div class="prose max-w-none">
-				<p>First, start the game server and a "dummy" opponent to have someone to play against:</p>
+				<p>To test your bot in a realistic environment before deploying, start the game server and a baseline opponent locally.</p>
 		    <div class="not-prose tabs tabs-lifted mb-6">
 	        <!-- Podman Tab -->
 	        <input type="radio" name="test_tool" class="tab" aria-label="Podman" checked="checked" />
@@ -16,10 +16,10 @@ templ localTesting() {
 	            <button onclick="copyCode('code-test-podman', this)" class="btn btn-sm btn-ghost absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">Copy</button>
 	            <div class="mockup-code bg-neutral text-neutral-content" id="code-test-podman">
 	                <pre data-prefix="#"><code># Start the server</code></pre>
-	                <pre data-prefix="$"><code><span class="text-info">podman</span> run --detach -p 8038:8038 docker.io/nemoahead/bomberman-server:latest</code></pre>
+	                <pre data-prefix="$"><code><span class="text-info">podman</span> run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/server:latest</code></pre>
 	                <pre data-prefix=" "><code></code></pre> <!-- Leerzeile für Optik -->
-	                <pre data-prefix="#"><code># Start the dummy opponent</code></pre>
-	                <pre data-prefix="$"><code><span class="text-info">podman</span> run --detach --network host docker.io/nemoahead/bomberman-client-go:idle</code></pre>
+	                <pre data-prefix="#"><code># Start a passive dummy opponent</code></pre>
+	                <pre data-prefix="$"><code><span class="text-info">podman</span> run --rm --network host ghcr.io/n3moahead/bomber:idle</code></pre>
 	            </div>
 	        </div>
 	        <!-- Docker Tab -->
@@ -28,41 +28,15 @@ templ localTesting() {
 	            <button onclick="copyCode('code-test-docker', this)" class="btn btn-sm btn-ghost absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">Copy</button>
 	            <div class="mockup-code bg-neutral text-neutral-content" id="code-test-docker">
 	                <pre data-prefix="#"><code># Start the server</code></pre>
-	                <pre data-prefix="$"><code><span class="text-info">docker</span> run --detach -p 8038:8038 nemoahead/bomberman-server:latest</code></pre>
+	                <pre data-prefix="$"><code><span class="text-info">docker</span> run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/server:latest</code></pre>
 	                <pre data-prefix=" "><code></code></pre> <!-- Leerzeile für Optik -->
-	                <pre data-prefix="#"><code># Start the dummy opponent</code></pre>
-	                <pre data-prefix="$"><code><span class="text-info">docker</span> run --detach --network host nemoahead/bomberman-client-go:idle</code></pre>
+	                <pre data-prefix="#"><code># Start a passive dummy opponent</code></pre>
+	                <pre data-prefix="$"><code><span class="text-info">docker</span> run --rm --network host ghcr.io/n3moahead/bomber:idle</code></pre>
 	            </div>
 	        </div>
 				</div>
 
-				<p class="mt-6">Finally, run your own bot:</p>
-
-				<div class="not-prose tabs tabs-lifted mb-6">
-					<input type="radio" name="lang_run" class="tab" aria-label="Golang" checked="checked" />
-					<div class="tab-content bg-base-100 border-base-300 rounded-b-box p-0 relative group">
-						<button onclick="copyCode('code-run-go', this)" class="btn btn-sm btn-ghost absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">Copy</button>
-						<div class="mockup-code bg-neutral text-neutral-content" id="code-run-go">
-							<pre data-prefix="$"><code><span class="text-success">go run</span> cmd/client_go/main.go</code></pre>
-						</div>
-					</div>
-
-					<input type="radio" name="lang_run" class="tab" aria-label="Rust" />
-					<div class="tab-content bg-base-100 border-base-300 rounded-b-box p-0 relative group">
-						<button onclick="copyCode('code-run-rust', this)" class="btn btn-sm btn-ghost absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">Copy</button>
-						<div class="mockup-code bg-neutral text-neutral-content" id="code-run-rust">
-							<pre data-prefix="$"><code><span class="text-success">cargo run</span></code></pre>
-						</div>
-					</div>
-
-					<input type="radio" name="lang_run" class="tab" aria-label="JavaScript" />
-					<div class="tab-content bg-base-100 border-base-300 rounded-b-box p-0 relative group">
-						<button onclick="copyCode('code-run-js', this)" class="btn btn-sm btn-ghost absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">Copy</button>
-						<div class="mockup-code bg-neutral text-neutral-content" id="code-run-js">
-							<pre data-prefix="$"><code><span class="text-success">npm run</span> start</code></pre>
-						</div>
-					</div>
-				</div>
+				<p class="mt-6">Finally, run your own bot according to the language tutorial you chose (e.g., <code>go run .</code>, <code>python bot.py</code>, etc.). It should automatically connect to <code>ws://localhost:8038/ws</code>.</p>
 			</div>
 		</div>
 	</div>
