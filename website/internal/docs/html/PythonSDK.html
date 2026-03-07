@@ -89,12 +89,12 @@
 </span></span></code></pre><p>For a realistic local test, run server + a default opponent image, then your bot.</p>
 <p>Default images used by BombAhead tooling:</p>
 <ul>
-<li>Server: <code>ghcr.io/n3moahead/bombahead/os-server:latest</code></li>
+<li>Server: <code>ghcr.io/n3moahead/bombahead/server:latest</code></li>
 <li>Opponent (aggressive): <code>ghcr.io/n3moahead/bomber:self-destruct</code></li>
 <li>Opponent (passive): <code>ghcr.io/n3moahead/bomber:idle</code></li>
 </ul>
 <pre style="color:#f8f8f2;background-color:#282a36;-moz-tab-size:2;-o-tab-size:2;tab-size:2;-webkit-text-size-adjust:none;"><code><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1</span><span><span style="color:#6272a4"># Terminal 1: game server</span>
-</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>docker run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/os-server:latest
+</span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2</span><span>docker run --rm -p 8038:8038 ghcr.io/n3moahead/bombahead/server:latest
 </span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3</span><span>
 </span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4</span><span><span style="color:#6272a4"># Terminal 2: default opponent</span>
 </span></span><span style="display:flex;"><span style="white-space:pre;-webkit-user-select:none;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5</span><span>docker run --rm --network host ghcr.io/n3moahead/bomber:idle
