@@ -23,6 +23,16 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
 								<button id="prev-tick" class="btn btn-primary">Prev</button>
 								<span id="tick-counter">Tick: 0 / { len(vm.History.Ticks) - 1 }</span>
 								<button id="next-tick" class="btn btn-primary">Next</button>
+								<button id="play" class="btn btn-primary">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+									  <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z" />
+									</svg>
+								</button>
+								<button id="pause" class="btn btn-primary">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+									  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5" />
+									</svg>
+								</button>
 							</div>
 						</div>
 
@@ -70,6 +80,9 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
       const tickCounter = document.getElementById("tick-counter");
       const prevBtn = document.getElementById("prev-tick");
       const nextBtn = document.getElementById("next-tick");
+      const playBtn = document.getElementById("play");
+      const pauseBtn = document.getElementById("pause");
+      let autoTickTimer = null;
       const moveListTbody = document.getElementById("move-list-tbody");
       const textureAtlas = new Image();
       textureAtlas.src = "/static/images/texture_atlas.png";
@@ -613,6 +626,32 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
         }
       });
 
+      const AUTO_TICK_INTERVALL_MS = 200;
+      function updatePlaybackButtons() {
+        const isPlaying = autoTickTimer !== null;
+        playBtn.classList.toggle("hidden", isPlaying);
+        pauseBtn.classList.toggle("hidden", !isPlaying);
+      }
+
+      playBtn.addEventListener("click", () => {
+        if (autoTickTimer === null) {
+          autoTickTimer = setInterval(() => {
+            if (currentTick < totalTicks) {
+              renderTick(currentTick + 1);
+            }
+          }, AUTO_TICK_INTERVALL_MS)
+          updatePlaybackButtons();
+        }
+      });
+
+      pauseBtn.addEventListener("click", () => {
+        if (autoTickTimer !== null) {
+          clearInterval(autoTickTimer);
+          autoTickTimer = null;
+          updatePlaybackButtons();
+        }
+      });
+
       let lastFrameTime = 0;
       const ANIMATION_INTERVAL = 200; // ms per frame
 
@@ -633,6 +672,7 @@ templ Details(csrf string, user *models.User, vm *viewmodels.MatchDetail, histor
       textureAtlas.onload = () => {
         populateMoveList();
         renderTick(0);
+        updatePlaybackButtons();
         requestAnimationFrame(animationLoop);
       };
     </script>
