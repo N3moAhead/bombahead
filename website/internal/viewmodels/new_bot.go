@@ -33,11 +33,14 @@ func (f *NewBotForm) Validate() bool {
 	if strings.TrimSpace(f.DockerHubUrl) == "" {
 		f.Errors["DockerHubUrl"] = "Docker Hub URL is required."
 	} else {
-		// It must start with 'docker.io/' or 'ghcr.io/'and can have a user/namespace and a tag.
-		dockerImageRegex := `^\(\bdocker\.io\b|\bghcr\.io\b\/([a-zA-Z0-9.-]+\/)*[a-zA-Z0-9.-]+(:[a-zA-Z0-9.-]+)?$`
+		// It must start with 'docker.io/' or 'ghcr.io/', have a user/namespace, and MUST have a tag.
+		dockerImageRegex := `^(?:docker\.io|ghcr\.io)\/([a-zA-Z0-9.-]+\/)*[a-zA-Z0-9.-]+:[a-zA-Z0-9.-]+$`
 		re := regexp.MustCompile(dockerImageRegex)
+
 		if !re.MatchString(f.DockerHubUrl) {
-			f.Errors["DockerHubUrl"] = "Please enter a valid Docker image URL starting with docker.io/ or ghcr.io/ (e.g., ghcr.io/user/repo:tag)."
+			f.Errors["DockerHubUrl"] = "Please enter a valid Docker image URL starting with docker.io/ or ghcr.io/ and include a specific tag (e.g., ghcr.io/user/repo:1.0.0)."
+		} else if strings.HasSuffix(f.DockerHubUrl, ":latest") {
+			f.Errors["DockerHubUrl"] = "The 'latest' tag is not allowed. Please use a specific version tag."
 		}
 	}
 
