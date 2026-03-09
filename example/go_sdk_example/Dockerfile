@@ -5,12 +5,10 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY . .
-
-RUN go build -o /app/client_go ./cmd/client_go/main.go
+RUN go build -o /app/bot ./cmd/bot/main.go
 
 FROM docker.io/alpine:latest
 WORKDIR /root/
+COPY --from=builder /app/bot .
 
-COPY --from=builder /app/client_go .
-
-CMD ["./client_go"]
+CMD ["./bot"]

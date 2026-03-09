@@ -51,6 +51,7 @@ func (b *SimpleBot) GetNextMove(state *bombahead.GameState, h *bombahead.GameHel
 	if state == nil || state.Me == nil {
 		return bombahead.DoNothing
 	}
+	bombahead.PrintField(state)
 
 	me := state.Me.Pos
 
